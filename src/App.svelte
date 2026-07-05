@@ -2,10 +2,11 @@
     import { onMount } from "svelte";
     import { getImageOfTheDay, type ImageOfTheDay } from "./lib/nasa";
     import Card from "./lib/Card.svelte";
+    import SearchBox from "./lib/SearchBox.svelte";
 
     onMount(async () => {
-        imageOfTheDay = await getImageOfTheDay();
         setInterval(updateTime, 1000);
+        imageOfTheDay = await getImageOfTheDay();
     });
 
     function updateTime() {
@@ -32,12 +33,17 @@
         {:else}
             <img src={imageOfTheDay.url} alt={imageOfTheDay.title} />
         {/if}
+    {:else}
+        <div class="loading">
+            <p>Loading...</p>
+        </div>
     {/if}
 
     <div class="columns">
         <div class="left"></div>
         <div class="center">
             <h1>{time}</h1>
+            <SearchBox></SearchBox>
         </div>
         <div class="right">
             <Card title="About this image">
@@ -49,7 +55,9 @@
 </div>
 
 <style>
-    #background img {
+    #background img,
+    #background video,
+    .loading {
         position: fixed;
         top: 0;
         left: 0;
@@ -59,6 +67,11 @@
         z-index: -1;
         filter: brightness(0.5);
         overflow: hidden;
+    }
+
+    .loading {
+        color: #fff;
+        background-color: #000;
     }
 
     .columns {
