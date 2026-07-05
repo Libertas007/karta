@@ -1,89 +1,83 @@
-<script>
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from './assets/vite.svg'
-  import heroImg from './assets/hero.png'
-  import Counter from './lib/Counter.svelte'
+<script lang="ts">
+    import { onMount } from "svelte";
+    import { getImageOfTheDay, type ImageOfTheDay } from "./lib/nasa";
+    import Card from "./lib/Card.svelte";
+
+    onMount(async () => {
+        imageOfTheDay = await getImageOfTheDay();
+        setInterval(updateTime, 1000);
+    });
+
+    function updateTime() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, "0");
+        const minutes = String(now.getMinutes()).padStart(2, "0");
+        const seconds = String(now.getSeconds()).padStart(2, "0");
+        time = `${hours}:${minutes}:${seconds}`;
+    }
+
+    let imageOfTheDay: ImageOfTheDay | null = $state(null);
+    let time = $state("00:00:00");
+    let query = $state("");
 </script>
 
-<section id="center">
-  <div class="hero">
-    <img src={heroImg} class="base" width="170" height="179" alt="" />
-    <img src={svelteLogo} class="framework" alt="Svelte logo" />
-    <img src={viteLogo} class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/App.svelte</code> and save to test <code>HMR</code></p>
-  </div>
-  <Counter />
-</section>
+<svelte:head>
+    <title>New Tab</title>
+</svelte:head>
 
-<div class="ticks"></div>
+<div id="background">
+    {#if imageOfTheDay}
+        {#if imageOfTheDay.media_type === "video"}
+            <video src={imageOfTheDay.url} autoplay muted></video>
+        {:else}
+            <img src={imageOfTheDay.url} alt={imageOfTheDay.title} />
+        {/if}
+    {/if}
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#documentation-icon"></use>
-    </svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank" rel="noreferrer">
-          <img class="logo" src={viteLogo} alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://svelte.dev/" target="_blank" rel="noreferrer">
-          <img class="button-icon" src={svelteLogo} alt="" />
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#social-icon"></use>
-    </svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li>
-        <a href="https://github.com/vitejs/vite" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#github-icon"></use>
-          </svg>
-          GitHub
-        </a>
-      </li>
-      <li>
-        <a href="https://chat.vite.dev/" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#discord-icon"></use>
-          </svg>
-          Discord
-        </a>
-      </li>
-      <li>
-        <a href="https://x.com/vite_js" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#x-icon"></use>
-          </svg>
-          X.com
-        </a>
-      </li>
-      <li>
-        <a href="https://bsky.app/profile/vite.dev" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#bluesky-icon"></use>
-          </svg>
-          Bluesky
-        </a>
-      </li>
-    </ul>
-  </div>
-</section>
+    <div class="columns">
+        <div class="left"></div>
+        <div class="center">
+            <h1>{time}</h1>
+        </div>
+        <div class="right">
+            <Card title="About this image">
+                <h2>{imageOfTheDay?.title}</h2>
+                <p class="explanation">{imageOfTheDay?.explanation}</p>
+            </Card>
+        </div>
+    </div>
+</div>
 
-<div class="ticks"></div>
-<section id="spacer"></section>
+<style>
+    #background img {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+        filter: brightness(0.5);
+        overflow: hidden;
+    }
+
+    .columns {
+        display: grid;
+        height: 100vh;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .columns > div {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .explanation {
+        font-size: 0.8rem;
+        line-height: 1.2rem;
+        overflow-y: auto;
+    }
+</style>
