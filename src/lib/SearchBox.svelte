@@ -57,43 +57,7 @@
         border: #fff 1px solid;
     }
 
-    input,
-    select,
-    button {
-        appearance: none;
-        border: #fff 1px solid;
-        outline: none;
-        background-color: rgba(0, 0, 0, 0.2);
-        font-family: "Space Mono", monospace;
-        color: #fff;
-        padding: 0.5rem;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-    }
-
     input {
         width: 100%;
-    }
-
-    input:hover,
-    input:focus,
-    select:hover,
-    select:focus {
-        background-color: rgba(0, 0, 0, 0.5);
-    }
-
-    button {
-        background-color: #fff;
-        color: #000;
-    }
-
-    button:hover {
-        background-color: rgba(255, 255, 255, 0.8);
-    }
-
-    option {
-        appearance: none;
-        background-color: #000;
-        color: #fff;
     }
 </style>

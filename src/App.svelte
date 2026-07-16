@@ -7,6 +7,7 @@
     onMount(async () => {
         setInterval(updateTime, 1000);
         imageOfTheDay = await getImageOfTheDay();
+        date = imageOfTheDay.date;
     });
 
     function updateTime() {
@@ -20,6 +21,23 @@
     let imageOfTheDay: ImageOfTheDay | null = $state(null);
     let time = $state("00:00:00");
     let query = $state("");
+    let update = $state(false);
+
+    let date = $state("");
+
+    async function goToDate() {
+        let datetime = new Date(date);
+
+        if (datetime > new Date()) {
+            alert("Date cannot be in the future.");
+            return;
+        }
+
+        if (date !== imageOfTheDay?.date) {
+            imageOfTheDay = await getImageOfTheDay(date);
+            update = !update;
+        }
+    }
 </script>
 
 <svelte:head>
@@ -29,7 +47,7 @@
 <div id="background">
     {#if imageOfTheDay}
         {#if imageOfTheDay.media_type === "video"}
-            <video src={imageOfTheDay.url} autoplay muted></video>
+            <video src={imageOfTheDay.url} autoplay muted loop></video>
         {:else}
             <img src={imageOfTheDay.url} alt={imageOfTheDay.title} />
         {/if}
@@ -46,10 +64,24 @@
             <SearchBox></SearchBox>
         </div>
         <div class="right">
-            <Card title="About this image">
-                <h2>{imageOfTheDay?.title}</h2>
-                <p class="explanation">{imageOfTheDay?.explanation}</p>
-            </Card>
+            {#key update}
+                <Card title="About this image">
+                    <h2>{imageOfTheDay?.title}</h2>
+                    <p class="explanation">{imageOfTheDay?.explanation}</p>
+                </Card>
+
+                <Card title="Time machine">
+                    <h2>Select image from another day</h2>
+
+                    <input
+                        type="date"
+                        name="date"
+                        id="date"
+                        bind:value={date}
+                    />
+                    <button onclick={goToDate}>Go!</button>
+                </Card>
+            {/key}
         </div>
     </div>
 </div>
@@ -72,6 +104,11 @@
     .loading {
         color: #fff;
         background-color: #000;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .columns {
